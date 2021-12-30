@@ -83,7 +83,13 @@ function GenDef()
 	let sourceName = expand('%:t:r') . ".cpp"
 	if bufexists(sourceName) <= 0
 		" echo "Source file not loaded: " . sourceName
-		exe 'vsp ' .. expand('%:r'). ".cpp"
+		let sourcePath = expand('%:r'). ".cpp"
+		" add an include line if the file does not exists
+		let addInclude = (filereadable(sourcePath) == 0)
+		exe 'vsp ' .. sourcePath
+		if (addInclude == 1)
+			call setline('.', '#include "' . headerName . '"')
+		endif
 		set switchbuf +=useopen
 		execute "sbuffer " . headerName
 	endif
