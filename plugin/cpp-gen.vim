@@ -40,7 +40,7 @@ function GetDef()
 	normal! hv0"ay
 	let prefix = trim(@a)
 	if len(prefix) > 0
-		let prefix = prefix . " "
+		let prefix = prefix . "\t"
 	endif
 
 	" Find postfix
@@ -68,7 +68,9 @@ function GetDef()
 
 
 
-	let generated = prefix . classNames . name . "(" . args . ")" . postfix . "\n{\n}"
+	" echom "prefix: " ..prefix.. " / classNames: " .. classNames .. " / name: " .. name
+	let prefix = substitute(prefix, "virtual\s*", "", "")
+	let generated = prefix . classNames . name . "(" . args . ")" . postfix . " {\n}"
 	call setpos(".", savepos)
 
 	return generated
@@ -80,21 +82,23 @@ function GenDef()
 	let headerName = @%
 	let sourceName = expand('%:t:r') . ".cpp"
 	if bufexists(sourceName) <= 0
-		echo "Source file not loaded: " . sourceName
-	else
-		" Get the generated code
-		let generated = GetDef()
-
-		" Switch to source buffer
+		" echo "Source file not loaded: " . sourceName
+		exe 'vsp ' .. expand('%:r'). ".cpp"
 		set switchbuf +=useopen
-		execute "sbuffer " . sourceName
-
-		" Write generated code to source buffer
-		execute "normal! Go\n" . generated
-
-		" Switch back
 		execute "sbuffer " . headerName
 	endif
+	" Get the generated code
+	let generated = GetDef()
+
+	" Switch to source buffer
+	set switchbuf +=useopen
+	execute "sbuffer " . sourceName
+
+	" Write generated code to source buffer
+	execute "normal! Go\n" . generated
+
+	" Switch back
+	execute "sbuffer " . headerName
 
 endfunction
 
