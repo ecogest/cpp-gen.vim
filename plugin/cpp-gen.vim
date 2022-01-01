@@ -67,9 +67,13 @@ function GetDef()
 	endwhile
 
 
+	" Move * or & before classname if necessary (avoid 'type class::*method(...)')
+	let ptr = matchstr(name, '\**&*')
+	let name = substitute(name, '\**&*', "", "")
+	let classNames = ptr . classNames
 
-	" echom "prefix: " ..prefix.. " / classNames: " .. classNames .. " / name: " .. name
-	let prefix = substitute(prefix, "virtual\s*", "", "")
+	let prefix = substitute(prefix, "virtual\s*\t*", "", "")
+	echom "prefix: " ..prefix.. " / classNames: " .. classNames .. " / name: " .. name
 	let generated = prefix . classNames . name . "(" . args . ")" . postfix . " {\n}"
 	call setpos(".", savepos)
 
@@ -88,7 +92,7 @@ function GenDef()
 		let addInclude = (filereadable(sourcePath) == 0)
 		exe 'vsp ' .. sourcePath
 		if (addInclude == 1)
-			call setline('.', '#include "' . headerName . '"')
+			call setline('.', '#include "' . fnamemodify(headerName, ':t') . '"')
 		endif
 		set switchbuf +=useopen
 		execute "sbuffer " . headerName
