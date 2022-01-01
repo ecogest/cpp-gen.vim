@@ -72,6 +72,9 @@ function GetDef()
 	let name = substitute(name, '\**&*', "", "")
 	let classNames = ptr . classNames
 
+	" Remove default arguments
+	let args = substitute(args, " *=[^,)]* *", "", "g")
+
 	let prefix = substitute(prefix, "virtual\s*\t*", "", "")
 	echom "prefix: " ..prefix.. " / classNames: " .. classNames .. " / name: " .. name
 	let generated = prefix . classNames . name . "(" . args . ")" . postfix . " {\n}"
